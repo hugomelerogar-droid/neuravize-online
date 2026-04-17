@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neuravize — IA & Automatización Estratégica</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Montserrat:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--gold:#C9A84C;--gold-light:#E2C97E;--gold-dim:#8B6F2E;--gold-glow:rgba(201,168,76,0.10);--black:#060606;--black-2:#0c0c0c;--black-3:#121212;--black-4:#181818;--white:#F5F0E8;--white-dim:rgba(245,240,232,0.52);--white-faint:rgba(245,240,232,0.07);--border:rgba(201,168,76,0.15);--border-strong:rgba(201,168,76,0.38)}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:var(--black);color:var(--white);font-family:'Montserrat',sans-serif;font-weight:300;overflow-x:hidden;cursor:none}
+
+/* CURSOR */
+.cursor{width:7px;height:7px;background:var(--gold);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9999;transition:transform 0.15s ease}
+.cursor-ring{width:30px;height:30px;border:1px solid rgba(201,168,76,0.45);border-radius:50%;position:fixed;top:0;left:0;pointer-events:none;z-index:9998}
+
+/* GRID TEXTURE */
+body::after{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(201,168,76,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(201,168,76,0.022) 1px,transparent 1px);background-size:80px 80px;pointer-events:none;z-index:1}
+
+/* NAV */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;padding:1.4rem 5%;display:flex;justify-content:space-between;align-items:center;transition:all 0.5s ease}
+nav.scrolled{background:rgba(6,6,6,0.97);border-bottom:1px solid var(--border);backdrop-filter:blur(16px)}
+.nav-logo{font-family:'Cormorant Garamond',serif;font-size:1.45rem;font-weight:600;color:var(--gold);letter-spacing:0.14em;text-transform:uppercase;text-decoration:none}
+.nav-links{display:flex;gap:2.5rem;list-style:none}
+.nav-links a{color:var(--white-dim);text-decoration:none;font-size:0.68rem;letter-spacing:0.18em;text-transform:uppercase;transition:color 0.3s}
+.nav-links a:hover{color:var(--gold)}
+.nav-cta{background:transparent;border:1px solid var(--gold-dim);color:var(--gold);padding:0.6rem 1.4rem;font-size:0.68rem;letter-spacing:0.15em;text-transform:uppercase;text-decoration:none;cursor:none;transition:all 0.3s;font-family:'Montserrat',sans-serif}
+.nav-cta:hover{background:var(--gold);color:var(--black)}
+
+/* HERO */
+#hero{position:relative;height:100vh;min-height:720px;display:flex;align-items:center;justify-content:center;overflow:hidden}
+#hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:0.2;will-change:transform}
+.hero-overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(6,6,6,0.25) 0%,rgba(6,6,6,0.48) 55%,rgba(6,6,6,1) 100%)}
+.hero-orb{position:absolute;width:600px;height:600px;border-radius:50%;background:radial-gradient(ellipse,rgba(201,168,76,0.07) 0%,transparent 70%);top:50%;left:50%;transform:translate(-50%,-50%);animation:orbPulse 7s ease-in-out infinite;pointer-events:none;z-index:1}
+@keyframes orbPulse{0%,100%{transform:translate(-50%,-50%) scale(1);opacity:0.5}50%{transform:translate(-50%,-50%) scale(1.18);opacity:1}}
+.hero-diagonal{position:absolute;bottom:-2px;left:0;right:0;height:120px;background:var(--black-2);clip-path:polygon(0 100%,100% 0,100% 100%);z-index:2}
+.hero-content{position:relative;z-index:3;text-align:center;max-width:940px;padding:0 2rem}
+.hero-eyebrow{font-size:0.62rem;letter-spacing:0.42em;text-transform:uppercase;color:var(--gold);margin-bottom:2rem;opacity:0;animation:fadeUp 1s ease 0.3s forwards}
+.hero-title{font-family:'Cormorant Garamond',serif;font-size:clamp(3rem,7vw,6.5rem);font-weight:300;line-height:1.0;color:var(--white);margin-bottom:1.2rem;opacity:0;animation:fadeUp 1s ease 0.5s forwards}
+.hero-title em{font-style:italic;color:var(--gold)}
+.hero-sub-big{font-size:clamp(0.85rem,1.4vw,0.98rem);font-weight:300;color:var(--white-dim);max-width:560px;margin:0 auto 0.65rem;line-height:1.85;opacity:0;animation:fadeUp 1s ease 0.65s forwards}
+.hero-sub-small{font-size:0.7rem;font-weight:300;color:rgba(245,240,232,0.32);max-width:520px;margin:0 auto 2.8rem;line-height:1.8;opacity:0;animation:fadeUp 1s ease 0.78s forwards}
+.hero-ctas{display:flex;gap:1.2rem;justify-content:center;flex-wrap:wrap;opacity:0;animation:fadeUp 1s ease 0.92s forwards}
+.btn-primary{background:var(--gold);color:var(--black);padding:1rem 2.5rem;font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;text-decoration:none;font-weight:600;cursor:none;transition:all 0.3s;font-family:'Montserrat',sans-serif;display:inline-block}
+.btn-primary:hover{background:var(--gold-light);transform:translateY(-2px)}
+.btn-secondary{background:transparent;color:var(--white-dim);padding:1rem 2.5rem;font-size:0.68rem;letter-spacing:0.22em;text-transform:uppercase;text-decoration:none;font-weight:400;cursor:none;transition:all 0.3s;font-family:'Montserrat',sans-serif;border:1px solid rgba(245,240,232,0.18);display:inline-block}
+.btn-secondary:hover{border-color:var(--gold-dim);color:var(--gold)}
+.scroll-cue{position:absolute;bottom:2.5rem;left:50%;transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;align-items:center;gap:0.5rem;opacity:0;animation:fadeUp 1s ease 1.3s forwards}
+.scroll-cue span{font-size:0.52rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold-dim)}
+.scroll-line{width:1px;height:46px;background:linear-gradient(to bottom,var(--gold-dim),transparent);animation:scrollBlink 2s ease-in-out infinite}
+@keyframes scrollBlink{0%,100%{opacity:0.3}50%{opacity:1}}
+
+/* MARQUEE */
+.marquee-strip{background:var(--gold);padding:0.6rem 0;overflow:hidden;position:relative;z-index:4}
+.marquee-inner{display:flex;gap:0;white-space:nowrap;animation:marquee 24s linear infinite}
+.marquee-item{font-size:0.58rem;letter-spacing:0.3em;text-transform:uppercase;color:var(--black);font-weight:600;padding:0 2.5rem}
+.marquee-sep{color:rgba(0,0,0,0.35);font-size:0.5rem}
+@keyframes marquee{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* SHARED */
+section{position:relative;z-index:2}
+.gold-line{width:50px;height:1px;background:var(--gold);margin:0 auto 1.4rem}
+.section-label{font-size:0.6rem;letter-spacing:0.38em;text-transform:uppercase;color:var(--gold);margin-bottom:1rem}
+.section-title{font-family:'Cormorant Garamond',serif;font-size:clamp(1.9rem,3.8vw,2.9rem);font-weight:300;line-height:1.15;color:var(--white)}
+.section-title em{font-style:italic;color:var(--gold)}
+.section-body{font-size:0.8rem;line-height:2;color:var(--white-dim);font-weight:300}
+.section-center{text-align:center;max-width:640px;margin:0 auto}
+
+/* STATS */
+#stats{padding:5rem 5%;background:var(--black-2);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
+#stats::before{content:'';position:absolute;top:0;left:20%;right:20%;height:1px;background:linear-gradient(90deg,transparent,var(--gold-dim),transparent)}
+.stats-grid{max-width:980px;margin:0 auto;display:grid;grid-template-columns:repeat(4,1fr);text-align:center}
+.stat-item{padding:2rem 1rem;border-right:1px solid var(--border)}
+.stat-item:last-child{border-right:none}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:3rem;font-weight:300;color:var(--gold);line-height:1}
+.stat-label{font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--white-dim);margin-top:0.5rem}
+
+/* PROBLEMA */
+#problema{padding:8rem 5%;background:var(--black);position:relative;overflow:hidden}
+#problema::before{content:'';position:absolute;top:-150px;right:-150px;width:550px;height:550px;border-radius:50%;background:radial-gradient(ellipse,rgba(201,168,76,0.04) 0%,transparent 65%);pointer-events:none}
+.problema-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1fr;gap:7rem;align-items:center}
+.pain-list{list-style:none;margin-top:2.5rem;display:flex;flex-direction:column;gap:1.2rem}
+.pain-list li{display:flex;align-items:flex-start;gap:1.2rem;padding:1.2rem;border:1px solid var(--border);background:var(--black-2);transition:border-color 0.4s,background 0.4s}
+.pain-list li:hover{border-color:var(--border-strong);background:var(--black-3)}
+.pain-num{font-family:'Cormorant Garamond',serif;font-size:1.8rem;font-weight:300;color:var(--gold-dim);line-height:1;min-width:2rem}
+.pain-text strong{color:var(--white);font-weight:500;display:block;font-size:0.8rem;margin-bottom:0.22rem}
+.pain-text span{font-size:0.74rem;color:var(--white-dim);line-height:1.6}
+
+/* IMAGE FRAMES */
+.img-frame{position:relative;overflow:hidden;background:var(--black-3);border:1px solid var(--border)}
+.img-frame img{width:100%;height:100%;object-fit:cover;display:block;opacity:0.55;transition:opacity 0.6s,transform 0.8s;filter:grayscale(30%) contrast(1.1)}
+.img-frame:hover img{opacity:0.72;transform:scale(1.04);filter:grayscale(15%) contrast(1.15)}
+.img-frame-overlay{position:absolute;inset:0;background:linear-gradient(160deg,rgba(201,168,76,0.18) 0%,rgba(6,6,6,0.45) 60%,rgba(6,6,6,0.75) 100%);mix-blend-mode:multiply;pointer-events:none}
+.img-caption{position:absolute;bottom:0;left:0;right:0;padding:0.9rem 1.1rem;background:linear-gradient(to top,rgba(6,6,6,0.88),transparent);font-size:0.58rem;letter-spacing:0.22em;text-transform:uppercase;color:var(--gold)}
+
+/* SERVICIOS */
+#servicios{padding:8rem 5%;background:var(--black-2);position:relative;overflow:hidden}
+#servicios::before{content:'';position:absolute;inset:0;background-image:radial-gradient(ellipse 80% 50% at 50% 0%,rgba(201,168,76,0.04) 0%,transparent 60%);pointer-events:none}
+.camino-nav{max-width:760px;margin:0 auto 4rem;display:grid;grid-template-columns:1fr 1fr;border:1px solid var(--border)}
+.camino-tab{padding:1.15rem;text-align:center;cursor:none;background:transparent;border:none;color:var(--white-dim);font-family:'Montserrat',sans-serif;font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;transition:all 0.3s;border-right:1px solid var(--border);position:relative}
+.camino-tab:last-child{border-right:none}
+.camino-tab.active{background:var(--black-3);color:var(--gold)}
+.camino-tab.active::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:linear-gradient(90deg,transparent,var(--gold),transparent)}
+.camino-panel{display:none;max-width:1100px;margin:0 auto}
+.camino-panel.active{display:block}
+.cam1-layout{display:grid;gap:2px;background:var(--border)}
+.cam1-diag,.cam1-impl{background:var(--black-3);padding:3.5rem;display:grid;grid-template-columns:1fr 1fr;gap:4rem;align-items:start}
+.cam1-impl{margin-top:2px}
+.cam2-layout{background:var(--black-3);padding:3.5rem;display:grid;grid-template-columns:1.2fr 1fr;gap:5rem;align-items:center}
+.cam2-img{height:420px}
+.service-block-num{font-family:'Cormorant Garamond',serif;font-size:4.5rem;font-weight:300;color:rgba(201,168,76,0.05);line-height:1;position:absolute;top:1rem;right:1.5rem}
+.service-block-tag{font-size:0.56rem;letter-spacing:0.35em;text-transform:uppercase;color:var(--gold);border:1px solid var(--border-strong);padding:0.3rem 0.85rem;display:inline-block;margin-bottom:1.6rem}
+.service-block-title{font-family:'Cormorant Garamond',serif;font-size:1.75rem;font-weight:300;color:var(--white);margin-bottom:0.55rem}
+.service-block-sub{font-size:0.66rem;color:var(--gold-dim);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1.2rem}
+.service-block-desc{font-size:0.79rem;line-height:1.95;color:var(--white-dim);margin-bottom:1.6rem}
+.service-block-features{list-style:none;display:flex;flex-direction:column;gap:0.6rem}
+.service-block-features li{font-size:0.74rem;color:var(--white-dim);display:flex;align-items:center;gap:0.75rem;line-height:1.5}
+.service-block-features li::before{content:'';display:inline-block;width:12px;height:1px;background:var(--gold);flex-shrink:0}
+.ver-proceso-btn{background:transparent;border:none;color:var(--gold);font-size:0.63rem;letter-spacing:0.28em;text-transform:uppercase;cursor:none;display:flex;align-items:center;gap:0.8rem;font-family:'Montserrat',sans-serif;padding:0;transition:gap 0.3s;margin-top:1.8rem}
+.ver-proceso-btn:hover{gap:1.3rem}
+.vp-arrow{width:26px;height:1px;background:var(--gold);position:relative;transition:width 0.3s}
+.ver-proceso-btn:hover .vp-arrow{width:40px}
+.vp-arrow::after{content:'';position:absolute;right:0;top:-3px;width:6px;height:6px;border-top:1px solid var(--gold);border-right:1px solid var(--gold);transform:rotate(45deg)}
+.proceso-panel{display:none;margin-top:1.4rem;border-top:1px solid var(--border);padding-top:1.3rem}
+.proceso-panel.active{display:block}
+.proceso-step{display:flex;gap:1rem;margin-bottom:0.85rem;align-items:flex-start}
+.proceso-step-num{font-family:'Cormorant Garamond',serif;font-size:1.1rem;color:var(--gold);min-width:1.7rem;line-height:1.4}
+.proceso-step-text{font-size:0.75rem;color:var(--white-dim);line-height:1.7}
+.proceso-step-text strong{color:var(--white);font-weight:500;display:block;font-size:0.76rem;margin-bottom:0.12rem}
+
+
+
+/* PROCESO */
+#proceso{padding:8rem 5%;background:var(--black-3);border-top:1px solid var(--border);position:relative;overflow:hidden}
+#proceso::after{content:'';position:absolute;bottom:-80px;left:-80px;width:380px;height:380px;border-radius:50%;background:radial-gradient(ellipse,rgba(201,168,76,0.04) 0%,transparent 70%);pointer-events:none}
+.proceso-inner{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1fr 1.15fr;gap:6rem;align-items:start}
+.timeline{position:relative;padding-left:1rem}
+.timeline::before{content:'';position:absolute;left:2.6rem;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--gold),var(--gold-dim),transparent)}
+.timeline-item{display:grid;grid-template-columns:5rem 1fr;gap:1.4rem;margin-bottom:3rem}
+.timeline-left{display:flex;flex-direction:column;align-items:center;padding-top:0.15rem}
+.timeline-dot{width:11px;height:11px;border:1px solid var(--gold);background:var(--black-3);border-radius:50%;position:relative;z-index:1;transition:background 0.3s}
+.timeline-item:hover .timeline-dot{background:var(--gold)}
+.timeline-num{font-family:'Cormorant Garamond',serif;font-size:0.7rem;color:var(--gold-dim);margin-top:0.35rem;letter-spacing:0.1em}
+.timeline-content{padding-bottom:1.8rem;border-bottom:1px solid var(--white-faint)}
+.timeline-item:last-child .timeline-content{border-bottom:none;padding-bottom:0}
+.timeline-step-title{font-family:'Cormorant Garamond',serif;font-size:1.18rem;font-weight:300;color:var(--white);margin-bottom:0.4rem}
+.timeline-step-desc{font-size:0.76rem;color:var(--white-dim);line-height:1.9}
+.proceso-side{position:sticky;top:7rem}
+.proceso-img{height:360px;margin-bottom:1.4rem}
+.proceso-callout{background:var(--black-4);border:1px solid var(--border);padding:1.4rem;border-left:2px solid var(--gold)}
+.proceso-callout p{font-size:0.77rem;color:var(--white-dim);line-height:1.85;font-style:italic}
+.proceso-callout cite{display:block;margin-top:0.75rem;font-size:0.62rem;letter-spacing:0.12em;text-transform:uppercase;color:var(--gold-dim);font-style:normal}
+
+/* FAQ */
+#faq{padding:8rem 5%;background:var(--black-2);border-top:1px solid var(--border)}
+.faq-list{max-width:760px;margin:0 auto;display:flex;flex-direction:column}
+.faq-item{border-bottom:1px solid var(--border);overflow:hidden}
+.faq-question{width:100%;background:transparent;border:none;padding:1.45rem 0;text-align:left;color:var(--white);font-size:0.82rem;font-family:'Montserrat',sans-serif;font-weight:400;cursor:none;display:flex;justify-content:space-between;align-items:center;gap:1rem;transition:color 0.3s}
+.faq-question:hover{color:var(--gold)}
+.faq-icon{width:13px;height:13px;flex-shrink:0;position:relative}
+.faq-icon::before,.faq-icon::after{content:'';position:absolute;background:var(--gold);transition:all 0.4s}
+.faq-icon::before{width:100%;height:1px;top:50%;left:0}
+.faq-icon::after{width:1px;height:100%;left:50%;top:0}
+.faq-item.open .faq-icon::after{transform:scaleY(0)}
+.faq-answer{max-height:0;overflow:hidden;transition:max-height 0.5s ease}
+.faq-item.open .faq-answer{max-height:200px}
+.faq-answer p{padding-bottom:1.4rem;font-size:0.78rem;line-height:2;color:var(--white-dim)}
+
+/* CTA FINAL */
+#cta-final{padding:10rem 5%;background:var(--black);text-align:center;position:relative;overflow:hidden}
+.cta-bg-circle{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:700px;height:700px;border-radius:50%;background:radial-gradient(ellipse,rgba(201,168,76,0.065) 0%,transparent 65%);pointer-events:none}
+.cta-bg-lines{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.cta-bg-lines::before,.cta-bg-lines::after{content:'';position:absolute;border:1px solid var(--border);border-radius:50%;top:50%;left:50%;transform:translate(-50%,-50%)}
+.cta-bg-lines::before{width:800px;height:800px}
+.cta-bg-lines::after{width:500px;height:500px}
+.cta-final-eyebrow{font-size:0.6rem;letter-spacing:0.4em;text-transform:uppercase;color:var(--gold);margin-bottom:1.4rem}
+.cta-final-title{font-family:'Cormorant Garamond',serif;font-size:clamp(2.4rem,5vw,4.4rem);font-weight:300;line-height:1.1;color:var(--white);max-width:680px;margin:0 auto 1.3rem}
+.cta-final-title em{font-style:italic;color:var(--gold)}
+.cta-final-sub{font-size:0.79rem;color:var(--white-dim);max-width:360px;margin:0 auto 0.8rem;line-height:1.9}
+.cta-note{font-size:0.63rem;color:rgba(245,240,232,0.28);letter-spacing:0.1em;margin-bottom:3rem}
+.cta-trust{display:flex;justify-content:center;gap:3rem;margin-top:3.5rem;flex-wrap:wrap}
+.trust-item{display:flex;align-items:center;gap:0.65rem;font-size:0.66rem;color:var(--white-dim)}
+.trust-icon{width:15px;height:15px;border:1px solid var(--gold-dim);border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:0.48rem;color:var(--gold);flex-shrink:0}
+
+/* FOOTER */
+footer{background:var(--black-2);border-top:1px solid var(--border);padding:3rem 5%;text-align:center}
+.footer-logo{font-family:'Cormorant Garamond',serif;font-size:1.3rem;font-weight:600;color:var(--gold);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:0.65rem}
+.footer-tagline{font-size:0.63rem;color:var(--white-dim);letter-spacing:0.18em;text-transform:uppercase;margin-bottom:1.1rem}
+.footer-copy{font-size:0.6rem;color:rgba(245,240,232,0.2);letter-spacing:0.08em}
+
+/* ANIMATIONS */
+@keyframes fadeUp{from{opacity:0;transform:translateY(28px)}to{opacity:1;transform:translateY(0)}}
+.reveal{opacity:0;transform:translateY(36px);transition:opacity 0.85s ease,transform 0.85s ease}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal-delay-1{transition-delay:0.1s}
+.reveal-delay-2{transition-delay:0.2s}
+.reveal-delay-3{transition-delay:0.3s}
+.reveal-delay-4{transition-delay:0.4s}
+.reveal-left{opacity:0;transform:translateX(-38px);transition:opacity 0.85s ease,transform 0.85s ease}
+.reveal-left.visible{opacity:1;transform:translateX(0)}
+.reveal-right{opacity:0;transform:translateX(38px);transition:opacity 0.85s ease,transform 0.85s ease}
+.reveal-right.visible{opacity:1;transform:translateX(0)}
+
+@media(max-width:900px){
+  .problema-inner,.proceso-inner{grid-template-columns:1fr;gap:3rem}
+  .cam1-diag,.cam1-impl,.cam2-layout{grid-template-columns:1fr;gap:2.5rem}
+  .casos-grid,.stats-grid{grid-template-columns:1fr 1fr;gap:1rem}
+  .nav-links{display:none}
+  .proceso-side{position:static}
+  .cam2-img{height:260px}
+  .stat-item{border-right:none;border-bottom:1px solid var(--border)}
+  .stat-item:last-child{border-bottom:none}
+}
+@media(max-width:600px){
+  .casos-grid,.stats-grid{grid-template-columns:1fr}
+  .camino-nav{grid-template-columns:1fr}
+  .camino-tab{border-right:none;border-bottom:1px solid var(--border)}
+}
+</style>
+</head>
+<body>
+
+<div class="cursor" id="cursor"></div>
+<div class="cursor-ring" id="cursorRing"></div>
+
+<nav id="navbar">
+  <a href="#hero" class="nav-logo">Neuravize</a>
+  <ul class="nav-links">
+    <li><a href="#servicios">Servicios</a></li>
+    <li><a href="#proceso">Proceso</a></li>
+    <li><a href="#faq">FAQ</a></li>
+  </ul>
+  <a href="#cta-final" class="nav-cta">Llamada gratuita</a>
+</nav>
+
+<!-- HERO -->
+<section id="hero">
+  <video id="hero-video" autoplay muted loop playsinline>
+    <source src="V11_BIEN_HECHO.mp4" type="video/mp4">
+  </video>
+  <div class="hero-overlay"></div>
+  <div class="hero-orb"></div>
+  <div class="hero-content">
+    <p class="hero-eyebrow">Neuravize · IA & Automatización Estratégica</p>
+    <h1 class="hero-title">Implementamos sistemas<br>para tu <em>empresa</em></h1>
+    <p class="hero-sub-big">Detectamos ineficiencias, diseñamos la solución y construimos sistemas a medida que transforman cómo opera tu negocio.</p>
+    <p class="hero-sub-small">Sin conocimientos técnicos. Sin código propio. Tú te enfocas en crecer — nosotros construimos los sistemas que lo hacen posible.</p>
+    <div class="hero-ctas">
+      <a href="#cta-final" class="btn-primary">Reserva tu llamada gratuita</a>
+      <a href="#servicios" class="btn-secondary">Ver los dos caminos</a>
+    </div>
+  </div>
+  <div class="hero-diagonal"></div>
+  <div class="scroll-cue">
+    <span>Scroll</span>
+    <div class="scroll-line"></div>
+  </div>
+</section>
+
+<div class="marquee-strip">
+  <div class="marquee-inner">
+    <span class="marquee-item">Diagnóstico Estratégico</span><span class="marquee-sep">✦</span>
+    <span class="marquee-item">Automatización de procesos</span><span class="marquee-sep">✦</span>
+    <span class="marquee-item">Implementación a medida</span><span class="marquee-sep">✦</span>
+    <span class="marquee-item">Integración de herramientas</span><span class="marquee-sep">✦</span>
+    <span class="marquee-item">IA aplicada al negocio</span><span class="marquee-sep">✦</span>
+    <span class="marquee-item">Sistemas que escalan</span><span class="marquee-sep">✦</span>
+    <span class="marquee-item">Diagnóstico Estratégico</span><span class="marquee-sep">✦</span>
+    <span class="marquee-item">Automatización de procesos</span><span class="marquee-sep">✦</span>
+    <span class="marquee-item">Implementación a medida</span><span class="marquee-sep">✦</span>
+    <span class="marquee-item">Integración de herramientas</span><span class="marquee-sep">✦</span>
+    <span class="marquee-item">IA aplicada al negocio</span><span class="marquee-sep">✦</span>
+    <span class="marquee-item">Sistemas que escalan</span><span class="marquee-sep">✦</span>
+  </div>
+</div>
+
+<section id="stats">
+  <div class="stats-grid reveal">
+    <div class="stat-item"><p class="stat-num">+40h</p><p class="stat-label">recuperadas por semana</p></div>
+    <div class="stat-item"><p class="stat-num">-70%</p><p class="stat-label">tareas manuales eliminadas</p></div>
+    <div class="stat-item"><p class="stat-num">2–6</p><p class="stat-label">semanas de implementación</p></div>
+    <div class="stat-item"><p class="stat-num">100%</p><p class="stat-label">precio cerrado · sin sorpresas</p></div>
+  </div>
+</section>
+
+<!-- PROBLEMA -->
+<section id="problema">
+  <div class="problema-inner">
+    <div class="reveal-left">
+      <p class="section-label">El problema</p>
+      <h2 class="section-title">Tu negocio pierde tiempo<br>en lo que <em>no debería</em></h2>
+      <p class="section-body" style="margin-top:1rem">La mayoría de empresas operan con procesos manuales, herramientas desconectadas y equipos que pierden horas en tareas repetitivas. No es un problema de personas — es un problema de sistemas.</p>
+      <a href="#servicios" class="btn-primary" style="margin-top:2.4rem;font-size:0.67rem;padding:0.9rem 2rem;display:inline-block;text-decoration:none">Ver cómo lo resolvemos</a>
+    </div>
+    <ul class="pain-list reveal-right">
+      <li><span class="pain-num">01</span><div class="pain-text"><strong>Desorganización total</strong><span>Información dispersa, procesos sin definir, nadie sabe quién hace qué.</span></div></li>
+      <li><span class="pain-num">02</span><div class="pain-text"><strong>Tareas repetitivas que consumen horas</strong><span>Tu equipo hace manualmente lo que un sistema haría en segundos.</span></div></li>
+      <li><span class="pain-num">03</span><div class="pain-text"><strong>Herramientas que no se hablan entre sí</strong><span>CRMs, hojas de cálculo, apps que no conectan y generan errores.</span></div></li>
+      <li><span class="pain-num">04</span><div class="pain-text"><strong>No saber por dónde empezar</strong><span>Quieres mejorar pero no tienes claro qué automatizar ni qué impacto tendrá.</span></div></li>
+    </ul>
+  </div>
+</section>
+
+<!-- SERVICIOS -->
+<section id="servicios">
+  <div class="section-center reveal" style="margin-bottom:1.5rem">
+    <p class="section-label">Dos caminos, una solución</p>
+    <div class="gold-line"></div>
+    <h2 class="section-title">¿Cuál es tu punto de partida?</h2>
+    <p class="section-body" style="margin-top:0.8rem">Según lo que ya sabes, te acompañamos desde el diagnóstico o directamente a la construcción.</p>
+  </div>
+  <div class="camino-nav reveal reveal-delay-2">
+    <button class="camino-tab active" onclick="switchCamino(0,this)">Camino 1 — No sé qué automatizar</button>
+    <button class="camino-tab" onclick="switchCamino(1,this)">Camino 2 — Sé lo que necesito</button>
+  </div>
+
+  <!-- CAMINO 1 -->
+  <div class="camino-panel active" id="cam-panel-0">
+    <div class="cam1-layout">
+      <!-- SERVICIO A -->
+      <div class="cam1-diag" style="position:relative">
+        <span class="service-block-num">A</span>
+        <div>
+          <span class="service-block-tag">Servicio A · Diagnóstico Estratégico</span>
+          <h3 class="service-block-title">Mapeamos tu negocio y te decimos exactamente qué automatizar</h3>
+          <p class="service-block-sub">Ideal si no sabes por dónde empezar</p>
+          <p class="service-block-desc">Auditamos tu empresa en profundidad, analizamos tus procesos y te entregamos un plan estratégico con todo lo que se puede automatizar, qué impacto tendrá y en qué orden hacerlo. Antes de invertir en desarrollo, sabes exactamente qué vas a obtener.</p>
+          <ul class="service-block-features">
+            <li>Auditoría por área operativa (marketing, gestión, delivery, administración)</li>
+            <li>Mapa completo de oportunidades de automatización</li>
+            <li>Clasificación por impacto, urgencia y dificultad</li>
+            <li>Flujos BPMN detallados de cada proceso</li>
+            <li>Roadmap de implementación por fases</li>
+            <li>Documento estructurado de diagnóstico entregable</li>
+          </ul>
+          <p style="margin-top:1.2rem;font-size:0.68rem;color:var(--gold);letter-spacing:0.1em">Desde 500€ · Pago único antes de iniciar</p>
+          <button class="ver-proceso-btn" onclick="toggleProceso('proc-diag',this)">Ver proceso <span class="vp-arrow"></span></button>
+          <div id="proc-diag" class="proceso-panel">
+            <div class="proceso-step"><span class="proceso-step-num">01</span><div class="proceso-step-text"><strong>Llamada inicial gratuita</strong>Entendemos tu negocio, áreas críticas y objetivos.</div></div>
+            <div class="proceso-step"><span class="proceso-step-num">02</span><div class="proceso-step-text"><strong>Elección de pack</strong>Básico (1 área), Avanzado (hasta 4) o Premium (empresa completa).</div></div>
+            <div class="proceso-step"><span class="proceso-step-num">03</span><div class="proceso-step-text"><strong>Auditoría y análisis</strong>Estudiamos cada proceso, identificamos fricciones y oportunidades reales.</div></div>
+            <div class="proceso-step"><span class="proceso-step-num">04</span><div class="proceso-step-text"><strong>Entregable completo</strong>Documento de diagnóstico, flujos BPMN y roadmap priorizado.</div></div>
+          </div>
+        </div>
+        <div class="img-frame" style="height:370px">
+          <img src="https://images.unsplash.com/photo-1557804506-669a67965ba0?w=900&q=85&auto=format" alt="Diagnóstico estratégico">
+          <div class="img-frame-overlay"></div>
+          <p class="img-caption">Diagnóstico Estratégico</p>
+        </div>
+      </div>
+      <!-- SERVICIO B -->
+      <div class="cam1-impl" style="position:relative">
+        <span class="service-block-num" style="opacity:0.04">B</span>
+        <div class="img-frame" style="height:370px">
+          <img src="https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=900&q=85&auto=format" alt="Implementación">
+          <div class="img-frame-overlay"></div>
+          <p class="img-caption">Implementación Post-diagnóstico</p>
+        </div>
+        <div>
+          <span class="service-block-tag">Servicio B · Implementación Post-diagnóstico</span>
+          <h3 class="service-block-title">Construimos lo que el diagnóstico ha definido</h3>
+          <p class="service-block-sub">Solo disponible tras completar el diagnóstico</p>
+          <p class="service-block-desc">Una vez que el diagnóstico define qué sistemas implementar, nos encargamos de toda la construcción. Dos fases independientes: primero definimos el sistema y su coste real — luego lo desarrollamos y entregamos funcionando.</p>
+          <ul class="service-block-features">
+            <li>Fase 1 — Activación: call estratégica, alcance y herramientas (1.000€)</li>
+            <li>Fase 2 — Desarrollo: construcción completa (precio variable)</li>
+            <li>Configuración de todas las herramientas necesarias</li>
+            <li>Integraciones entre plataformas activas</li>
+            <li>Pruebas, validación y puesta en marcha</li>
+            <li>Entrega con todos los accesos al cliente</li>
+          </ul>
+          <p style="margin-top:1.2rem;font-size:0.68rem;color:var(--gold);letter-spacing:0.1em">Fase 1: 1.000€ · Fase 2: precio cerrado antes de aprobar</p>
+          <button class="ver-proceso-btn" onclick="toggleProceso('proc-impl',this)">Ver proceso <span class="vp-arrow"></span></button>
+          <div id="proc-impl" class="proceso-panel">
+            <div class="proceso-step"><span class="proceso-step-num">01</span><div class="proceso-step-text"><strong>Activación (Fase 1)</strong>Call estratégica, ajuste de alcance y selección de herramientas.</div></div>
+            <div class="proceso-step"><span class="proceso-step-num">02</span><div class="proceso-step-text"><strong>Presupuesto Fase 2</strong>Coste cerrado del desarrollo completo antes de aprobar.</div></div>
+            <div class="proceso-step"><span class="proceso-step-num">03</span><div class="proceso-step-text"><strong>Contrato y pago</strong>Solo se inicia al aprobar presupuesto y firmar contrato.</div></div>
+            <div class="proceso-step"><span class="proceso-step-num">04</span><div class="proceso-step-text"><strong>Desarrollo y entrega</strong>Construimos, probamos y entregamos el sistema al 100%.</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="text-align:center;margin-top:3rem">
+      <a href="#cta-final" class="btn-primary" style="font-size:0.67rem;padding:0.95rem 2.4rem;text-decoration:none">Empezar con diagnóstico</a>
+    </div>
+  </div>
+
+  <!-- CAMINO 2 -->
+  <div class="camino-panel" id="cam-panel-1">
+    <div class="cam2-layout" style="position:relative">
+      <div>
+        <span class="service-block-tag">Camino 2 · Implementación Directa</span>
+        <h3 class="service-block-title">Ya sabes lo que necesitas — lo construimos directamente</h3>
+        <p class="service-block-sub">Sistema a medida · Precio cerrado · Sin diagnóstico previo</p>
+        <p class="service-block-desc" style="margin-top:1rem">Tienes claro qué sistema o automatización necesitas. Analizamos la viabilidad técnica, definimos el alcance exacto, te damos un precio cerrado y lo construimos de principio a fin. Todo transparente desde el primer minuto.</p>
+        <ul class="service-block-features" style="margin-top:1.4rem">
+          <li>Análisis de viabilidad técnica previo</li>
+          <li>Definición de alcance exacto del sistema</li>
+          <li>Precio cerrado antes de firmar nada</li>
+          <li>Desarrollo e integración completa</li>
+          <li>Pruebas exhaustivas y validación</li>
+          <li>Puesta en marcha y entrega de todos los accesos</li>
+          <li>Sin sorpresas ni costes ocultos</li>
+        </ul>
+        <p style="margin-top:1.4rem;font-size:0.68rem;color:var(--gold);letter-spacing:0.1em">100% precio cerrado · Pago completo antes de iniciar</p>
+        <button class="ver-proceso-btn" onclick="toggleProceso('proc-cam2',this)" style="margin-bottom:1.4rem">Ver proceso <span class="vp-arrow"></span></button>
+        <div id="proc-cam2" class="proceso-panel">
+          <div class="proceso-step"><span class="proceso-step-num">01</span><div class="proceso-step-text"><strong>Comunicas tu necesidad</strong>Nos describes el sistema o automatización que necesitas.</div></div>
+          <div class="proceso-step"><span class="proceso-step-num">02</span><div class="proceso-step-text"><strong>Viabilidad técnica</strong>Verificamos que es construible con las herramientas correctas.</div></div>
+          <div class="proceso-step"><span class="proceso-step-num">03</span><div class="proceso-step-text"><strong>Alcance y precio cerrado</strong>Precio definitivo antes de firmar nada.</div></div>
+          <div class="proceso-step"><span class="proceso-step-num">04</span><div class="proceso-step-text"><strong>Contrato y pago</strong>Sin pago completo, no se inicia ningún trabajo.</div></div>
+          <div class="proceso-step"><span class="proceso-step-num">05</span><div class="proceso-step-text"><strong>Desarrollo y entrega</strong>Construimos, probamos y entregamos el sistema funcional.</div></div>
+        </div>
+        <a href="#cta-final" class="btn-primary" style="font-size:0.67rem;padding:0.95rem 2.2rem;text-decoration:none;display:inline-block">Solicitar implementación</a>
+      </div>
+      <div class="cam2-img img-frame">
+        <img src="https://images.unsplash.com/photo-1488590528505-98d2b5aba04b?w=900&q=85&auto=format" alt="Implementación directa">
+        <div class="img-frame-overlay"></div>
+        <p class="img-caption">Implementación Directa</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+
+<!-- PROCESO -->
+<section id="proceso">
+  <div class="proceso-inner">
+    <div>
+      <p class="section-label reveal">Cómo trabajamos</p>
+      <div class="gold-line" style="margin:0 0 1.3rem"></div>
+      <h2 class="section-title reveal" style="margin-bottom:1rem">Un proceso <em>claro</em><br>de principio a fin</h2>
+      <p class="section-body reveal" style="margin-bottom:3rem">Sin ambigüedades. Sin letra pequeña. Cada paso está definido y acordado antes de empezar.</p>
+      <div class="timeline">
+        <div class="timeline-item reveal">
+          <div class="timeline-left"><div class="timeline-dot"></div><span class="timeline-num">01</span></div>
+          <div class="timeline-content"><h3 class="timeline-step-title">Llamada gratuita de 30 min</h3><p class="timeline-step-desc">Nos cuentas tu empresa y tus problemas. Sin compromisos, sin presión. Solo escuchamos.</p></div>
+        </div>
+        <div class="timeline-item reveal reveal-delay-1">
+          <div class="timeline-left"><div class="timeline-dot"></div><span class="timeline-num">02</span></div>
+          <div class="timeline-content"><h3 class="timeline-step-title">Definimos el camino</h3><p class="timeline-step-desc">¿Diagnóstico primero o implementación directa? Te proponemos el servicio más adecuado.</p></div>
+        </div>
+        <div class="timeline-item reveal reveal-delay-2">
+          <div class="timeline-left"><div class="timeline-dot"></div><span class="timeline-num">03</span></div>
+          <div class="timeline-content"><h3 class="timeline-step-title">Propuesta y contrato</h3><p class="timeline-step-desc">Alcance exacto y precio cerrado. Nada avanza sin tu firma ni sin el pago completo.</p></div>
+        </div>
+        <div class="timeline-item reveal reveal-delay-3">
+          <div class="timeline-left"><div class="timeline-dot"></div><span class="timeline-num">04</span></div>
+          <div class="timeline-content"><h3 class="timeline-step-title">Ejecución y entrega</h3><p class="timeline-step-desc">Trabajamos. Te informamos en cada fase. Recibes el sistema funcionando al 100% o el diagnóstico completo.</p></div>
+        </div>
+        <div class="timeline-item reveal reveal-delay-4">
+          <div class="timeline-left"><div class="timeline-dot"></div><span class="timeline-num">05</span></div>
+          <div class="timeline-content"><h3 class="timeline-step-title">Seguimiento (opcional)</h3><p class="timeline-step-desc">El mantenimiento puede contratarse como add-on. Sin él, recibes todos los accesos para gestionarlo por tu cuenta.</p></div>
+        </div>
+      </div>
+    </div>
+    <div class="proceso-side reveal-right">
+      <div class="img-frame proceso-img">
+        <img src="https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=900&q=85&auto=format" alt="Equipo Neuravize">
+        <div class="img-frame-overlay"></div>
+        <p class="img-caption">Así trabajamos</p>
+      </div>
+      <div class="proceso-callout">
+        <p>"Con Neuravize por primera vez entendí exactamente dónde se iba el tiempo en mi empresa. El diagnóstico fue un antes y un después."</p>
+        <cite>— Ana G., fundadora de una consultora de 12 personas</cite>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FAQ -->
+<section id="faq">
+  <div class="section-center reveal" style="margin-bottom:4rem">
+    <p class="section-label">Preguntas frecuentes</p>
+    <div class="gold-line"></div>
+    <h2 class="section-title">Todo lo que necesitas saber</h2>
+  </div>
+  <div class="faq-list reveal">
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">¿Cuánto tiempo tarda la implementación?<span class="faq-icon"></span></button>
+      <div class="faq-answer"><p>El tiempo varía según los procesos y la estructura de cada empresa. Las primeras integraciones suelen estar en marcha en 2 a 6 semanas. Los proyectos más amplios se desarrollan por fases acordadas desde el inicio.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">¿Qué tipos de procesos se pueden automatizar?<span class="faq-icon"></span></button>
+      <div class="faq-answer"><p>Nos especializamos en flujos de trabajo repetitivos en las 4 áreas principales: marketing, delivery, gestión y administración, utilizando lógica avanzada e Inteligencia Artificial.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">¿Pueden integrarse con nuestras herramientas actuales?<span class="faq-icon"></span></button>
+      <div class="faq-answer"><p>Sí. Ofrecemos integraciones con CRMs, herramientas de gestión de proyectos, apps de comunicación y cualquier plataforma de tu stack actual. Todo adaptado a tu entorno específico.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">¿Necesito conocimientos técnicos para usar el servicio?<span class="faq-icon"></span></button>
+      <div class="faq-answer"><p>Para nada. Nuestro equipo se encarga de toda la configuración, integración y optimización. Tú solo te enfocas en tus objetivos — nosotros automatizamos el resto.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">¿Cuánto cuesta exactamente?<span class="faq-icon"></span></button>
+      <div class="faq-answer"><p>Cada caso es específico, pero somos 100% transparentes desde el inicio. El diagnóstico tiene precios cerrados desde 500€. La implementación directa se presupuesta con precio cerrado antes de firmar. Agenda una llamada gratuita y te lo decimos en 30 minutos.</p></div>
+    </div>
+    <div class="faq-item">
+      <button class="faq-question" onclick="toggleFaq(this)">¿Qué pasa si necesito mantenimiento después?<span class="faq-icon"></span></button>
+      <div class="faq-answer"><p>El mantenimiento no está incluido por defecto pero puede contratarse como add-on. Sin él, te entregamos todos los accesos y puedes gestionarlo por tu cuenta. Lo aclaramos todo antes de empezar.</p></div>
+    </div>
+  </div>
+</section>
+
+<!-- CTA FINAL -->
+<section id="cta-final">
+  <div class="cta-bg-circle"></div>
+  <div class="cta-bg-lines"></div>
+  <p class="cta-final-eyebrow reveal">¿Listo para el siguiente nivel?</p>
+  <h2 class="cta-final-title reveal reveal-delay-1">Empieza con una <em>llamada</em><br>sin compromiso</h2>
+  <p class="cta-final-sub reveal reveal-delay-2">30 minutos. Sin presión. Te decimos exactamente qué podemos hacer por tu empresa y cómo lo haríamos.</p>
+  <p class="cta-note reveal reveal-delay-2">Gratuita · Sin compromiso · Respuesta en 24h</p>
+  <div class="reveal reveal-delay-3">
+    <a href="https://calendly.com" target="_blank" class="btn-primary" style="font-size:0.72rem;padding:1.1rem 3rem">Reservar llamada gratuita</a>
+  </div>
+  <div class="cta-trust reveal reveal-delay-4">
+    <div class="trust-item"><div class="trust-icon">✓</div>Precio cerrado desde el inicio</div>
+    <div class="trust-item"><div class="trust-icon">✓</div>Contrato firmado antes de trabajar</div>
+    <div class="trust-item"><div class="trust-icon">✓</div>Entrega 100% funcional garantizada</div>
+  </div>
+</section>
+
+<footer>
+  <p class="footer-logo">Neuravize</p>
+  <p class="footer-tagline">IA & Automatización Estratégica · neuravize.com</p>
+  <p class="footer-copy">© 2025 Neuravize · Todos los derechos reservados</p>
+</footer>
+
+<script>
+const cursor=document.getElementById('cursor'),ring=document.getElementById('cursorRing');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cursor.style.left=mx-3.5+'px';cursor.style.top=my-3.5+'px'});
+(function animRing(){rx+=(mx-rx)*0.1;ry+=(my-ry)*0.1;ring.style.left=rx-15+'px';ring.style.top=ry-15+'px';requestAnimationFrame(animRing)})();
+document.querySelectorAll('a,button').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{cursor.style.transform='scale(2.5)';ring.style.transform='scale(1.6)'});
+  el.addEventListener('mouseleave',()=>{cursor.style.transform='scale(1)';ring.style.transform='scale(1)'});
+});
+const navbar=document.getElementById('navbar');
+window.addEventListener('scroll',()=>navbar.classList.toggle('scrolled',scrollY>80));
+const obs=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('visible')})},{threshold:0.1});
+document.querySelectorAll('.reveal,.reveal-left,.reveal-right').forEach(el=>obs.observe(el));
+function toggleFaq(btn){const item=btn.parentElement,open=item.classList.contains('open');document.querySelectorAll('.faq-item.open').forEach(i=>i.classList.remove('open'));if(!open)item.classList.add('open')}
+function toggleProceso(id,btn){const panel=document.getElementById(id),open=panel.classList.contains('active');document.querySelectorAll('.proceso-panel.active').forEach(p=>p.classList.remove('active'));if(!open)panel.classList.add('active')}
+function switchCamino(idx,btn){document.querySelectorAll('.camino-tab').forEach(t=>t.classList.remove('active'));document.querySelectorAll('.camino-panel').forEach(p=>p.classList.remove('active'));btn.classList.add('active');document.getElementById('cam-panel-'+idx).classList.add('active')}
+window.addEventListener('scroll',()=>{const v=document.getElementById('hero-video');if(v)v.style.transform='translateY('+scrollY*0.28+'px)'});
+</script>
+</body>
+</html>
